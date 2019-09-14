@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+	<grid name="event-grid" title="Event"
+		model="com.axelor.event.db.Event">
+		<field name="reference" />
+		<field name="startDate" />
+		<field name="endDate" />
+		<field name="registrationOpen" />
+		<field name="registrationClose" />
+		<field name="capacity" />
+		<field name="eventFees" />
+
+
+
+	</grid>
+	<form name="event-form" title="Event"
+		model="com.axelor.event.db.Event" onSave="action-event-validate-event">
+		<toolbar>
+			<button name="importReg" title="Import Registration"
+				onClick="action-event-view-event-wizard" readonlyIf="!id" />
+			<button name="btnPrint" title="Print"
+				onClick="action-event-method-generate-report" icon="fa-print" />
+			<button name="sendEmail" title="send Email"
+				onClick="action-event-method-send-email" />
+		</toolbar>
+
+
+		<panel title="Event" css="panel-blue">
+			<field name="reference" />
+			<field name="startDate" />
+			<field name="endDate" />
+			<field name="venue" />
+			<field name="registrationOpen" />
+			<field name="registrationClose" />
+			<field name="capacity" />
+			<field name="eventFees" />
+			<field name="description" widget="html" />
+			<panel-related field="discountsList"
+				onChange="action-method-event-calculate-totalDiscount">
+				<field name="beforeDays" />
+				<field name="discountPercent" />
+				<field name="discountAmount" />
+			</panel-related>
+			<panel-related field="eventRegistrationList"
+				onChange="action-method-event-registration-set-totalEntry,action-method-event-calculate-amountCollected"
+				onNew="action-attr-event-set-event">
+				<field name="event" />
+				<field name="name" />
+				<field name="email" pattern="\A[A-Z0-9+_.-]+@[A-Z0-9.-]+\Z" />
+				<field name="address" />
+				<field name="registrationDate" />
+				<field name="amount" />
+			</panel-related>
+			<field name="totalEntry" />
+			<field name="amountCollected" />
+			<field name="totalDiscount" />
+
+		</panel>
+
+	</form>
+
+	<cards name="event-card" title="Event"
+		model="com.axelor.event.db.Event" orderBy="reference">
+		<field name="reference" />
+		<field name="startDate" />
+		<field name="endDate" />
+		<field name="venue" />
+		<template><![CDATA[
+      <div class="span12">
+      <strong>Reference</strong>
+      <br>{{reference}}
+      <br>startDate:{{startDate}}
+      <br>endDate:{{endDate}}
+      </div>
+    ]]></template>
+	</cards>
+
+	<calendar name="event-my-calender" title="My Events"
+		model="com.axelor.event.db.Event" colorBy="reference"
+		eventStart="startDate" eventStop="endDate" eventLength="1">
+		<field name="reference" />
+		<field name="venue" />
+	</calendar>
+
+
+	<action-method
+		name="action-method-event-registration-set-totalEntry">
+		<call class="com.axelor.event.web.EventController"
+			method="setTotalEntry" />
+	</action-method>
+
+	<action-validate name="action-event-validate-event">
+		<error message="Registrations exceeds Capacity!!"
+			if="totalEntry &gt; capacity" />
+		<error message="Invalid Registration Open Date" if="registrationOpen &gt; registrationClose "/>
+		<error message="Invalid Registration Close Date" if="registrationClose  &lt; registrationOpen "/>
+	</action-validate>
+
+	<action-method
+		name="action-method-event-calculate-amountCollected">
+		<call class="com.axelor.event.web.EventController"
+			method="calculateAmountCollected" />
+	</action-method>
+
+	<action-method
+		name="action-method-event-calculate-totalDiscount">
+		<call class="com.axelor.event.web.EventController"
+			method="calculateTotalDiscount" />
+	</action-method>
+
+	<action-attrs name="action-attr-event-set-event">
+		<attribute for="event" name="hidden" expr="true" />
+	</action-attrs>
+
+	<action-report output="event-report"
+		name="action-event-method-generate-report"
+		design="EventReport.rptdesign" format="pdf">
+		<param name="EventId" expr="eval: id" />
+	</action-report>
+
+
+
+
+	<action-view name="action-event-view-event-wizard"
+		title="Import Registration" model="com.axelor.event.db.Event">
+		<view type="form" name="import-registration-wizard-form" />
+		<view-param name="popup" value="true" />
+		<view-param name="popup-save" value="false" />
+		<view-param name="show-toolbar" value="false" />
+		<view-param name="show-confirm" value="false" />
+	</action-view>
+	
+	<form name="import-registration-wizard-form"
+		title="Import Registration" model="com.axelor.event.db.Event"
+		css="panel-blue">
+		<panel name="wizardPanel" title="Select File" css="panel-blue">
+			<field name="metaFile" title="Input file" type="many-to-one"
+				target="com.axelor.meta.db.MetaFile" widget="binary-link" />
+			<button name="btnImport" title="Import"
+				onClick="action-method-import-registration,close"
+				readonlyIf="metaFile == null" />
+		</panel>
+	</form>
+
+	<action-method name="action-method-import-registration">
+		<call class="com.axelor.event.web.ImportRegistrationController"
+			method="importRegistration" />
+	</action-method>
+
+
+</object-views>

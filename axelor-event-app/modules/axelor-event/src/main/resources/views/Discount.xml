@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+  
+  <grid name="discount-grid" title="Discount"
+		model="com.axelor.event.db.Discount">
+		<field name="beforeDays" />
+		<field name="discountPercent" />
+		<field name="discountAmount" />
+		
+
+	</grid>
+	<form name="discount-form" title="Discount"
+		model="com.axelor.event.db.Discount">
+		<panel title="Discount" css="panel-green">
+		<field name="beforeDays" onChange="action-discount-onchange-before-days"/>
+		<field name="discountPercent" onChange="action-discount-calculateDiscountAmount"/>
+		<field name="discountAmount" />
+		
+		</panel>
+	</form>
+	
+	<action-method name="action-discount-calculateDiscountAmount">
+	<call class="com.axelor.event.web.DiscountController" method="calculateDiscountAmount"/>
+	</action-method>
+	
+	<action-method name="action-discount-onchange-before-days">
+	<call class="com.axelor.event.web.DiscountController" method="validateDuration"/>
+	</action-method>
+</object-views>
