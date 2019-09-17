@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://axelor.com/xml/ns/object-views
   http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
   
-  <grid name="eventRegistration-grid" title="Event Registation"
+  <grid name="eventRegistration-grid" title="Event Registration"
 		model="com.axelor.event.db.EventRegistration">
 		<field name="event" />
 		<field name="name" />
@@ -15,26 +15,30 @@
 		
 
 	</grid>
-	<form name="eventRegistration-form" title="Event Registation"
-		model="com.axelor.event.db.EventRegistration" >
+	<form name="eventRegistration-form" title="Event Registration"
+		model="com.axelor.event.db.EventRegistration" onSave="action-method-event-registration-validate-capacity">
 		<panel title="Event Registration" css="panel-red">
-		<field name="event" onChange="action-method-calculate-amount"/>
-		<field name="name" />
+		<field name="event" hideIf="$popup()" />
+		<field name="name" onChange="action-method-registration-date-validation,action-method-calculate-amount"/>
 		<field name="email" pattern="^[a-z0-9A-ZáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ!#$%&amp;'*+/=?^_`{|}~-]+(?:\.[a-z0-9A-ZáàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ!#$%&amp;'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[a-z]{2,})$"/>
 		<field name="address" />
-		<field name="registrationDate" onChange="action-method-date-validation" />
+		<field name="registrationDate" onChange="action-method-registration-date-validation,action-method-calculate-amount"/>
 		<field name="amount"/>
 	
 		</panel>
 	</form>
-	<action-method name="action-method-date-validation">
+	<action-method name="action-method-registration-date-validation">
 		<call class="com.axelor.event.web.EventRegistrationController"
-			method="validateDate" />
+			method="validateRegistrationDate" />
 	</action-method>
 
 	<action-method name="action-method-calculate-amount">
 	<call class="com.axelor.event.web.EventRegistrationController"
 			method="calculateAmount" />
+	</action-method>
+	
+	<action-method name="action-method-event-registration-validate-capacity">
+	<call class="com.axelor.event.web.EventRegistrationController" method="validateCapacity"/>
 	</action-method>
 	
 </object-views>

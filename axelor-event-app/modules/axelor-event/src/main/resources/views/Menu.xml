@@ -30,7 +30,7 @@
 	<menuitem name="event-root-discount" parent="event-root" title="Discount"
 		action="event-root-event.view.discount" />
 
-	<action-view name="event-root-event.view.discount" title="Discount" model="com.axelor.axelor.gst.db.Country">
+	<action-view name="event-root-event.view.discount" title="Discount" model="com.axelor.event.db.Discount">
 		<view type="grid" name="discount-grid" />
 		<view type="form" name="discount-form" />
 	</action-view>

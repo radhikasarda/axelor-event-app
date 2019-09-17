@@ -37,19 +37,46 @@ public class EventController {
 	
 	public void calculateTotalDiscount(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
-		List<Discount> discountList = event.getDiscountsList();
-		BigDecimal discountAmount = BigDecimal.ZERO;
-		if(discountList!=null) {
-			for(Discount discount:discountList) {
-				discountAmount =discountAmount.add(discount.getDiscountAmount());
+		BigDecimal totalDiscount = BigDecimal.ZERO;
+		
+		totalDiscount = (event.getEventFees().multiply(new BigDecimal(event.getTotalEntry()))).subtract(event.getAmountCollected());
+		System.out.println(totalDiscount+"TD");
+		
+		event.setTotalDiscount(totalDiscount);
+		response.setValues(event);
+		
+	}
+	
+
+	public void validateEventDate(ActionRequest request, ActionResponse response) {
+		
+		Event event = request.getContext().asType(Event.class);
+
+		if(event.getStartDate() != null && event.getEndDate() != null) {
+			
+			if(event.getStartDate().isAfter(event.getEndDate()) || event.getEndDate().isBefore(event.getStartDate())) {
+				
+				response.setError("Invalid Start Or End Dates");
+			}
+			
+		}
+		
+		if(event.getRegistrationOpen() !=null && event.getRegistrationClose() != null) {
+			if(event.getRegistrationOpen().isAfter(event.getRegistrationClose()) || event.getRegistrationClose().isBefore(event.getRegistrationOpen())) {
+				response.setError("Invalid Registration Open Or Close Dates");
+			}
+			
+		}
+		
+		if(event.getStartDate() !=null && event.getRegistrationClose() != null) {
+			if(event.getRegistrationClose().isAfter(event.getStartDate().toLocalDate()) || event.getRegistrationOpen().isAfter(event.getStartDate().toLocalDate())) {
+				response.setError("Invalid Dates");
 				
 			}
 		}
-		event.setTotalDiscount(discountAmount);
-		response.setValues(event);
-		
-		
+	
 	}
+	
 	
 
 }

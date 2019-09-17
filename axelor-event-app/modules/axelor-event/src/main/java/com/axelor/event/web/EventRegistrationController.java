@@ -1,39 +1,57 @@
 package com.axelor.event.web;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.axelor.event.db.Discount;
 import com.axelor.event.db.Event;
 import com.axelor.event.db.EventRegistration;
+import com.axelor.event.exception.IExceptionMessage;
 import com.axelor.event.service.EventRegistrationService;
+import com.axelor.i18n.I18n;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.inject.Inject;
+import com.axelor.rpc.Context;
 
 public class EventRegistrationController {
 
-	@Inject EventRegistrationService eventService;
-	public void validateDate(ActionRequest request, ActionResponse response) {
+	@Inject
+	EventRegistrationService eventRegistrationService;
 
-		EventRegistration eventRegistration = request.getContext().asType(EventRegistration.class);
+	public void validateRegistrationDate(ActionRequest request, ActionResponse response) {
+		Context context = request.getContext();
+		
+		EventRegistration eventRegistration = context.asType(EventRegistration.class);
+	
+		Event event = eventRegistrationService.getEvent(context);
 
-		Event event = eventRegistration.getEvent();
-
-		if (eventRegistration.getRegistrationDate().toLocalDate().isBefore(event.getRegistrationOpen())
-				|| eventRegistration.getRegistrationDate().toLocalDate().isAfter(event.getRegistrationClose())) {
-			response.setError("The Registration Date is incorrect");
+		if (event != null && eventRegistration.getRegistrationDate()!=null &&  event.getRegistrationOpen() != null && event.getRegistrationClose() != null) {
+			if (eventRegistration.getRegistrationDate().toLocalDate().isBefore(event.getRegistrationOpen())
+					|| eventRegistration.getRegistrationDate().toLocalDate().isAfter(event.getRegistrationClose())) {
+				//response.setError("The Registration Date is incorrect");
+				response.setError(I18n.get(IExceptionMessage.REGISTRATION_DATE_INCORRECT));
+			}
 		}
 	}
 
 	public void calculateAmount(ActionRequest request, ActionResponse response) {
+		Context context = request.getContext();
 
-		EventRegistration eventRegistration = request.getContext().asType(EventRegistration.class);
+		EventRegistration eventRegistration = context.asType(EventRegistration.class);
 
-		Event event =eventRegistration.getEvent();
+		Event event = eventRegistrationService.getEvent(context);
 		
-		eventRegistration=eventService.calculate(eventRegistration,event);
-
+		if(event!=null) {
+		eventRegistration = eventRegistrationService.calculate(eventRegistration, event);
+		}
 		response.setValues(eventRegistration);
-	} 
+	}
+
+	public void validateCapacity(ActionRequest request, ActionResponse response) {
+
+		Context context = request.getContext();
+		Event event = eventRegistrationService.getEvent(context);
+
+		if (event.getCapacity() == 0 || event.getCapacity() <= event.getTotalEntry()) {
+			response.setError("Registrations exceeds Capacity!!");
+		}
+
+	}
 }

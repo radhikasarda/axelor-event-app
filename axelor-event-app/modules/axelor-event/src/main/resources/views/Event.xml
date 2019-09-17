@@ -23,31 +23,35 @@
 			<button name="importReg" title="Import Registration"
 				onClick="action-event-view-event-wizard" readonlyIf="!id" />
 			<button name="btnPrint" title="Print"
-				onClick="action-event-method-generate-report" icon="fa-print" />
+				onClick="action-event-method-generate-report" icon="fa-print"
+				readonlyIf="!id" />
 			<button name="sendEmail" title="send Email"
-				onClick="action-event-method-send-email" />
+				onClick="action-send-by-email-with-template" />
 		</toolbar>
 
 
 		<panel title="Event" css="panel-blue">
 			<field name="reference" />
-			<field name="startDate" />
-			<field name="endDate" />
+			<field name="startDate"
+				onChange="action-method-date-validation" />
+			<field name="endDate" onChange="action-method-date-validation" />
 			<field name="venue" />
-			<field name="registrationOpen" />
-			<field name="registrationClose" />
+			<field name="registrationOpen"
+				onChange="action-method-date-validation" />
+			<field name="registrationClose"
+				onChange="action-method-date-validation" />
 			<field name="capacity" />
-			<field name="eventFees" />
-			<field name="description" widget="html" />
-			<panel-related field="discountsList"
-				onChange="action-method-event-calculate-totalDiscount">
+			<field name="eventFees"
+				onChange="action-method-event-calculate-totalDiscount" />
+			<field name="description" widget="html" colSpan="12" />
+			<panel-related field="discountsList" colSpan="12">
 				<field name="beforeDays" />
 				<field name="discountPercent" />
 				<field name="discountAmount" />
 			</panel-related>
 			<panel-related field="eventRegistrationList"
-				onChange="action-method-event-registration-set-totalEntry,action-method-event-calculate-amountCollected"
-				onNew="action-attr-event-set-event">
+				onChange="action-method-event-registration-set-totalEntry,action-method-event-calculate-amountCollected,action-method-event-calculate-totalDiscount"
+				onNew="action-attr-event-set-event" colSpan="12">
 				<field name="event" />
 				<field name="name" />
 				<field name="email" pattern="\A[A-Z0-9+_.-]+@[A-Z0-9.-]+\Z" />
@@ -55,6 +59,9 @@
 				<field name="registrationDate" />
 				<field name="amount" />
 			</panel-related>
+			
+			</panel>
+			<panel sidebar="true" name="amountPanel" title="Total Amounts">
 			<field name="totalEntry" />
 			<field name="amountCollected" />
 			<field name="totalDiscount" />
@@ -96,8 +103,6 @@
 	<action-validate name="action-event-validate-event">
 		<error message="Registrations exceeds Capacity!!"
 			if="totalEntry &gt; capacity" />
-		<error message="Invalid Registration Open Date" if="registrationOpen &gt; registrationClose "/>
-		<error message="Invalid Registration Close Date" if="registrationClose  &lt; registrationOpen "/>
 	</action-validate>
 
 	<action-method
@@ -111,6 +116,13 @@
 		<call class="com.axelor.event.web.EventController"
 			method="calculateTotalDiscount" />
 	</action-method>
+
+
+	<action-method name="action-method-date-validation">
+		<call class="com.axelor.event.web.EventController"
+			method="validateEventDate" />
+	</action-method>
+
 
 	<action-attrs name="action-attr-event-set-event">
 		<attribute for="event" name="hidden" expr="true" />
@@ -133,7 +145,7 @@
 		<view-param name="show-toolbar" value="false" />
 		<view-param name="show-confirm" value="false" />
 	</action-view>
-	
+
 	<form name="import-registration-wizard-form"
 		title="Import Registration" model="com.axelor.event.db.Event"
 		css="panel-blue">

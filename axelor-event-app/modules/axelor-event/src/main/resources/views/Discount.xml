@@ -13,7 +13,7 @@
 
 	</grid>
 	<form name="discount-form" title="Discount"
-		model="com.axelor.event.db.Discount">
+		model="com.axelor.event.db.Discount" >
 		<panel title="Discount" css="panel-green">
 		<field name="beforeDays" onChange="action-discount-onchange-before-days"/>
 		<field name="discountPercent" onChange="action-discount-calculateDiscountAmount"/>
