@@ -6,13 +6,14 @@
 	<module name="axelor-event" package="com.axelor.event.db" />
 
 	<entity name="EventRegistration">
-		<string name="importId" title="ImportId"></string>
+		<string name="importId" title="ImportId"/>
 		<many-to-one name="event" title="Event" ref="com.axelor.event.db.Event"/>
 		<string name="name" title="Name"/>
 		<string name="email" title="Email"/>
 		<many-to-one name="address" title="Address" ref="com.axelor.event.db.Address"/>
 		<datetime name="registrationDate" title="Registration Date" />	
 		<decimal name="amount" title="Amount" readonly="true"/>
+		<boolean name="isEmailSent" title="Email Sent" default="false"/>
 	</entity>
 
 

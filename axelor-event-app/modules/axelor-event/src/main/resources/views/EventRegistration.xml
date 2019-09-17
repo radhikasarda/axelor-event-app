@@ -12,6 +12,7 @@
 		<field name="address" />
 		<field name="registrationDate" />
 		<field name="amount"/>
+		<field name="isEmailSent"/>
 		
 
 	</grid>
@@ -24,7 +25,7 @@
 		<field name="address" />
 		<field name="registrationDate" onChange="action-method-registration-date-validation,action-method-calculate-amount"/>
 		<field name="amount"/>
-	
+		<field name="isEmailSent"/>
 		</panel>
 	</form>
 	<action-method name="action-method-registration-date-validation">

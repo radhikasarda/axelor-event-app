@@ -25,8 +25,8 @@
 			<button name="btnPrint" title="Print"
 				onClick="action-event-method-generate-report" icon="fa-print"
 				readonlyIf="!id" />
-			<button name="sendEmail" title="send Email"
-				onClick="action-send-by-email-with-template" />
+			<button name="sendEmail" title="Send Email"
+				onClick="action-send-by-email-with-template" readonlyIf="!id"/>
 		</toolbar>
 
 
