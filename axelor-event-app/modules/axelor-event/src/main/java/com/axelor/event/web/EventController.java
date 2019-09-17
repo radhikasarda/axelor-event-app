@@ -68,7 +68,7 @@ public class EventController {
 			
 		}
 		
-		if(event.getStartDate() !=null && event.getRegistrationClose() != null) {
+		if(event.getStartDate() !=null && event.getRegistrationClose() != null && event.getRegistrationOpen() != null) {
 			if(event.getRegistrationClose().isAfter(event.getStartDate().toLocalDate()) || event.getRegistrationOpen().isAfter(event.getStartDate().toLocalDate())) {
 				response.setError("Invalid Dates");
 				

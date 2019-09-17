@@ -54,4 +54,17 @@ public class EventRegistrationController {
 		}
 
 	}
+	
+	public void setParentEvent(ActionRequest request, ActionResponse response) {
+		
+		EventRegistration eventRegistration = request.getContext().asType(EventRegistration.class);
+
+	    if (eventRegistration.getEvent() == null) {
+	      Event event = request.getContext().getParent().asType(Event.class);
+	      eventRegistration.setEvent(event);
+	      response.setValues(eventRegistration);
+	    }
+		
+		
+	}
 }
