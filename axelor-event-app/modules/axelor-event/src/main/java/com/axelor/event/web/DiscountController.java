@@ -46,9 +46,7 @@ public class DiscountController {
 				LocalDate registrationclose = event.getRegistrationClose();
 
 				Long eventdays = ChronoUnit.DAYS.between(registrationstart, registrationclose);
-				System.out.println(eventdays + "eventdayss:::");
 				if (beforeDays > eventdays) {
-					System.out.println("inside before greater");
 					response.setError("Incorrect Before Days");
 				}
 

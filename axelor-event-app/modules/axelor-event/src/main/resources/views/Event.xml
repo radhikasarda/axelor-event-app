@@ -26,7 +26,7 @@
 				onClick="action-event-method-generate-report" icon="fa-print"
 				readonlyIf="!id" />
 			<button name="sendEmail" title="Send Email"
-				onClick="action-send-by-email-with-template" readonlyIf="!id"/>
+				onClick="action-method-event-send-email" readonlyIf="!id"/>
 		</toolbar>
 
 
@@ -122,7 +122,10 @@
 		<call class="com.axelor.event.web.EventController"
 			method="validateEventDate" />
 	</action-method>
-
+	
+	<action-method name="action-method-event-send-email">
+	<call class="com.axelor.event.web.EventController" method="sendEmail"/>
+	</action-method>
 
 	<action-attrs name="action-attr-event-set-event">
 		<attribute for="event" name="hidden" expr="true" />

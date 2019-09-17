@@ -1,9 +1,9 @@
 package com.axelor.event.web;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.axelor.event.db.Discount;
 import com.axelor.event.db.Event;
 import com.axelor.event.db.EventRegistration;
 import com.axelor.rpc.ActionRequest;
@@ -75,6 +75,34 @@ public class EventController {
 			}
 		}
 	
+	}
+	
+	public void sendEmail(ActionRequest request, ActionResponse response) {
+		
+		Event event = request.getContext().asType(Event.class);
+		List<EventRegistration> eventRegstrationsList = event.getEventRegistrationList();
+		List<String> emailAdressList = new ArrayList<String>();
+		if(eventRegstrationsList != null) {
+			
+			for(EventRegistration eventRegistered : eventRegstrationsList) {
+				
+				if(eventRegistered.getEmail() != null) {
+					System.out.println(eventRegistered.getEmail());
+					emailAdressList.add(eventRegistered.getEmail());
+					
+				}
+				
+				
+			}
+			if(!emailAdressList.isEmpty()) {
+			
+			
+				System.out.println(emailAdressList);
+			}
+		}
+		
+		
+		
 	}
 	
 	
