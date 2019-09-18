@@ -1,16 +1,30 @@
 package com.axelor.event.web;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.mail.MessagingException;
+
+import com.axelor.apps.message.db.EmailAddress;
+import com.axelor.apps.message.db.Message;
+import com.axelor.apps.message.db.repo.EmailAccountRepository;
+import com.axelor.apps.message.service.MessageService;
 import com.axelor.event.db.Event;
 import com.axelor.event.db.EventRegistration;
+import com.axelor.exception.AxelorException;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.google.inject.Inject;
 
 
 public class EventController {
+	
+	@Inject MessageService messageService;
 
 	public void setTotalEntry(ActionRequest request, ActionResponse response) {
 		Event event = request.getContext().asType(Event.class);
@@ -81,23 +95,40 @@ public class EventController {
 		
 		Event event = request.getContext().asType(Event.class);
 		List<EventRegistration> eventRegstrationsList = event.getEventRegistrationList();
-		List<String> emailAdressList = new ArrayList<String>();
+		Set<EmailAddress> emailAddressSet = new HashSet<EmailAddress>();
 		if(eventRegstrationsList != null) {
 			
 			for(EventRegistration eventRegistered : eventRegstrationsList) {
 				
-				if(eventRegistered.getEmail() != null) {
-					System.out.println(eventRegistered.getEmail());
-					emailAdressList.add(eventRegistered.getEmail());
+				if(eventRegistered.getEmail() != null && !eventRegistered.getIsEmailSent()) {
+					EmailAddress emailAddress = new EmailAddress();
+					emailAddress.setAddress(eventRegistered.getEmail());
+					emailAddressSet.add(emailAddress);
+					
+					eventRegistered.setIsEmailSent(true);
 					
 				}
 				
 				
 			}
-			if(!emailAdressList.isEmpty()) {
-			
-			
-				System.out.println(emailAdressList);
+			if(!emailAddressSet.isEmpty()) {
+				System.out.println(emailAddressSet);
+			    Message message = new Message();
+		        message.setMailAccount(Beans.get(EmailAccountRepository.class).all().fetchOne());
+		        message.setToEmailAddressSet(emailAddressSet);
+		        message.setSubject("Regarding event Registration");
+		        message.setContent("Your Event has been registered successfully ");
+		        try {
+					messageService.sendByEmail(message);
+				} catch (MessagingException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (AxelorException e) {
+					e.printStackTrace();
+				}
+		        
+		        response.setFlash("Email Sent successfully");
 			}
 		}
 		
