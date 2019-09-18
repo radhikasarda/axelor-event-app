@@ -28,7 +28,7 @@ public class ImportRegistrationController {
 		} else {
 			Integer id = (Integer) request.getContext().get("_id");
 			importEventRegistrationService.importCsv(dataFile, id);
-			//response.setFlash("Registrations imported  successfully!!");
+			response.setFlash("Registrations imported  successfully!!");
 		}
 
 		

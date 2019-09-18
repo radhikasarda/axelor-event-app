@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -17,80 +19,72 @@ import com.axelor.data.Importer;
 import com.axelor.data.Listener;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.db.Model;
+import com.axelor.exception.AxelorException;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.google.common.io.Files;
 
 public class ImportEventRegistrationServiceImpl implements ImportEventRegistrationService {
-	
+
 	private Logger log = LoggerFactory.getLogger(getClass());
+
 	@Override
 	public void importCsv(MetaFile dataFile, Integer id) {
+
+		
+		File configXmlFile = this.getConfigXmlFile();
+		File dataCsvFile = this.getDataCsvFile(dataFile);
+		
+		
+		Map<String, Object> context = new HashMap<String, Object>();
+		context.put("_event_id", id);
+		Importer importer = new CSVImporter(configXmlFile.getAbsolutePath(), "/home/axelor/Projects/EVENTAPP/axelor-event-app/modules/axelor-event/src/main/resources/data/input/");
+	      
+	      
+	      importer.setContext(context);
+	      importer.run();
+	   
+
+	  }
+	  
+	
+
+	private File getDataCsvFile(MetaFile dataFile) {
+
 		File csvFile = null;
-		File configFile = null;
 		try {
 			File tempDir = Files.createTempDir();
 			csvFile = new File(tempDir, "registrations.csv");
+
+			Files.copy(MetaFiles.getPath(dataFile).toFile(), csvFile);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return csvFile;
+	}
+
+	private File getConfigXmlFile() {
+
+		File configFile = null;
+		try {
 			configFile = File.createTempFile("input-config", ".xml");
-			InputStream bindFileInputStream = this.getClass().getResourceAsStream("/data/input-config.xml");
+
+			InputStream bindFileInputStream = this.getClass()
+					.getResourceAsStream("/data/" +"input-config.xml");
+
+			if (bindFileInputStream == null) {
+				throw new AxelorException();
+			}
+
 			FileOutputStream outputStream = new FileOutputStream(configFile);
 
 			IOUtils.copy(bindFileInputStream, outputStream);
 
-			Files.copy(MetaFiles.getPath(dataFile).toFile(), csvFile);
-
-			System.out.println(csvFile);
-			System.out.println(configFile.getAbsolutePath());
-			
-			 final Importer importer = new CSVImporter(configFile.getAbsolutePath()); 
-			 
-			 final List<Model> records = new ArrayList<>();
-			 importer.addListener(new Listener() { 
-		            @Override
-		            public void imported(Model bean) {
-		                log.info("Bean saved : {}(id={})",
-		                        bean.getClass().getSimpleName(),
-		                        bean.getId());
-		                records.add(bean);
-		            }
-
-		            @Override
-		            public void imported(Integer total, Integer success) {
-		                log.info("Record (total): " + total);
-		                log.info("Record (success): " + success);
-		            }
-
-		            @Override
-		            public void handle(Model bean, Exception e) {
-
-		            }
-		        });
- 
-			 importer.run(new ImportTask() { 
-
-		            @Override
-		            public void configure() throws IOException {
-		                // provide input data
-		                input("csvFile", new File("/tmp/1568699790885-0/registrations.csv")); 
-		            }
-
-		            @Override
-		            public boolean handle(ImportException exception) { 
-		                log.error("Import error : " + exception);
-		                return false;
-		            }
-
-		            @Override
-		            public boolean handle(IOException e) { 
-		                log.error("IOException error : " + e);
-		                return true;
-		            }
-		        });
-			 
-			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return configFile;
 	}
 
 }

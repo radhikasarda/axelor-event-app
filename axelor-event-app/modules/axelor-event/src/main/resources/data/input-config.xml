@@ -6,5 +6,6 @@
      
    <input file="EventRegistrations.csv" separator=";" type="com.axelor.event.db.EventRegistration"  search="self.importId = :importId"  >
    <bind column="event" to="event"></bind>
+   <bind to="event" search="self.id = :_event_id" update="true" />
    </input>
  </csv-inputs>
