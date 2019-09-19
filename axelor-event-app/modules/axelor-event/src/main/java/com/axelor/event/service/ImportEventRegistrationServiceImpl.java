@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -15,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.data.Importer;
+import com.axelor.data.Listener;
 import com.axelor.data.csv.CSVImporter;
+import com.axelor.db.Model;
 import com.axelor.event.db.Event;
 import com.axelor.event.db.repo.EventRepository;
 import com.axelor.exception.AxelorException;
@@ -31,6 +35,7 @@ public class ImportEventRegistrationServiceImpl implements ImportEventRegistrati
 	@Override
 	public String importCsv(MetaFile dataFile, Integer id) {
 
+		
 		int noOfCsvLines = 0;
 		String message = null;
 		Event event = (Beans.get(EventRepository.class).all().filter("self.id=?", id).fetchOne());
@@ -59,8 +64,33 @@ public class ImportEventRegistrationServiceImpl implements ImportEventRegistrati
 				Importer importer = new CSVImporter(configXmlFile.getAbsolutePath(),
 						"/home/axelor/Projects/EVENTAPP/axelor-event-app/modules/axelor-event/src/main/resources/data/input/");
 				importer.setContext(context);
+				
+				final List<Model> records = new ArrayList<>();
+				importer.addListener(new Listener() { 
+		            @Override
+		            public void imported(Model bean) {
+		                log.info("Bean saved : {}(id={})",
+		                        bean.getClass().getSimpleName(),
+		                        bean.getId());
+		                records.add(bean);
+		            }
+
+		            @Override
+		            public void imported(Integer total, Integer success) {
+		                log.info("Record (total): " + total);
+		                log.info("Record (success): " + success);
+
+		            }
+
+		            @Override
+		            public void handle(Model bean, Exception e) {
+
+		            }
+		        });
+				
+				
 				importer.run();
-				message = "Registration imported Successfully";
+				message = records.size() + " Successful " + "&"+ ((noOfCsvLines -1) - records.size())+" Unsuccessful imports";
 
 			}
 

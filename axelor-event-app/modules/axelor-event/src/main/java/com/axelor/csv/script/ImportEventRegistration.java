@@ -17,7 +17,6 @@ public class ImportEventRegistration {
 	    if (event != null && eventRegistration.getRegistrationDate()!=null &&  event.getRegistrationOpen() != null && event.getRegistrationClose() != null) {
 			if (eventRegistration.getRegistrationDate().toLocalDate().isBefore(event.getRegistrationOpen())
 					|| eventRegistration.getRegistrationDate().toLocalDate().isAfter(event.getRegistrationClose())) {
-				//response.setError("The Registration Date is incorrect");
 				unsuccessfullImports++;
 				 
 			}

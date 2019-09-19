@@ -83,7 +83,6 @@ public class EventController {
 				
 			}
 			if(!emailAddressSet.isEmpty()) {
-				System.out.println(emailAddressSet);
 			    Message message = new Message();
 		        message.setMailAccount(Beans.get(EmailAccountRepository.class).all().fetchOne());
 		        message.setToEmailAddressSet(emailAddressSet);

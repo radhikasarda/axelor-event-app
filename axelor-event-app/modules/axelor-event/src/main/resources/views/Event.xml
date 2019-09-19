@@ -53,7 +53,7 @@
 				onNew="action-attr-event-set-event" colSpan="12">
 				<field name="event" />
 				<field name="name" />
-				<field name="email" pattern="\A[A-Z0-9+_.-]+@[A-Z0-9.-]+\Z" />
+				<field name="email"/>
 				<field name="address" />
 				<field name="registrationDate" />
 				<field name="amount" />
