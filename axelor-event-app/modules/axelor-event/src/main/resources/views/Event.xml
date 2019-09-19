@@ -18,28 +18,27 @@
 
 	</grid>
 	<form name="event-form" title="Event"
-		model="com.axelor.event.db.Event" onSave="action-event-validate-event">
+		model="com.axelor.event.db.Event" onSave="action-group-event-onsave">
 		<toolbar>
 			<button name="importReg" title="Import Registration"
-				onClick="action-event-view-event-wizard" readonlyIf="!id" />
+				onClick="save,action-event-view-event-wizard" readonlyIf="!id" />
 			<button name="btnPrint" title="Print"
 				onClick="action-event-method-generate-report" icon="fa-print"
 				readonlyIf="!id" />
 			<button name="sendEmail" title="Send Email"
-				onClick="action-method-event-send-email" readonlyIf="!id"/>
+				onClick="action-method-event-send-email" readonlyIf="!id" />
 		</toolbar>
 
 
 		<panel title="Event" css="panel-blue">
 			<field name="reference" />
-			<field name="startDate"
-				onChange="action-method-date-validation" />
-			<field name="endDate" onChange="action-method-date-validation" />
+			<field name="startDate" onChange="action-validate-event-start-end-date" />
+			<field name="endDate" onChange="action-validate-event-start-end-date" />
 			<field name="venue" />
 			<field name="registrationOpen"
-				onChange="action-method-date-validation" />
+				onChange="action-validate-event-registration-open-close-date" />
 			<field name="registrationClose"
-				onChange="action-method-date-validation" />
+				onChange="action-validate-event-registration-open-close-date" />
 			<field name="capacity" />
 			<field name="eventFees"
 				onChange="action-method-event-calculate-totalDiscount" />
@@ -59,9 +58,9 @@
 				<field name="registrationDate" />
 				<field name="amount" />
 			</panel-related>
-			
-			</panel>
-			<panel sidebar="true" name="amountPanel" title="Total Amounts">
+
+		</panel>
+		<panel sidebar="true" name="amountPanel" title="Total Amounts">
 			<field name="totalEntry" />
 			<field name="amountCollected" />
 			<field name="totalDiscount" />
@@ -94,13 +93,39 @@
 	</calendar>
 
 
+
+	<action-validate name="action-validate-event-start-end-date">
+		<error message="Invalid Start or End Dates"
+			if="startDate != null &amp;&amp; 
+			endDate != null &amp;&amp; 
+			startDate.toLocalDate() &gt; endDate.toLocalDate() " />
+	</action-validate>
+
+	<action-validate
+		name="action-validate-event-registration-open-close-date">
+		<error
+			message="Invalid Registration Open or Registration Close Dates"
+			if="(registrationOpen != null &amp;&amp;
+			 registrationClose != null &amp;&amp; 
+			 registrationOpen &gt; registrationClose) || 
+			 (startDate != null &amp;&amp; registrationOpen &gt; startDate.toLocalDate()) 
+			 || (startDate != null &amp;&amp; registrationClose &gt;= startDate.toLocalDate())"/>
+	</action-validate>
+
 	<action-method
 		name="action-method-event-registration-set-totalEntry">
 		<call class="com.axelor.event.web.EventController"
 			method="setTotalEntry" />
 	</action-method>
 
-	<action-validate name="action-event-validate-event">
+
+	<action-group name="action-group-event-onsave">
+	<action name="action-validate-event-capacity"/>
+	<action name="action-validate-event-start-end-date"/>
+	<action name="action-validate-event-registration-open-close-date"/>
+	</action-group>
+
+	<action-validate name="action-validate-event-capacity">
 		<error message="Registrations exceeds Capacity!!"
 			if="totalEntry &gt; capacity" />
 	</action-validate>
@@ -117,14 +142,9 @@
 			method="calculateTotalDiscount" />
 	</action-method>
 
-
-	<action-method name="action-method-date-validation">
-		<call class="com.axelor.event.web.EventController"
-			method="validateEventDate" />
-	</action-method>
-	
 	<action-method name="action-method-event-send-email">
-	<call class="com.axelor.event.web.EventController" method="sendEmail"/>
+		<call class="com.axelor.event.web.EventController"
+			method="sendEmail" />
 	</action-method>
 
 	<action-attrs name="action-attr-event-set-event">
@@ -147,6 +167,7 @@
 		<view-param name="popup-save" value="false" />
 		<view-param name="show-toolbar" value="false" />
 		<view-param name="show-confirm" value="false" />
+		<view-param name="popup" value="reload"/>
 	</action-view>
 
 	<form name="import-registration-wizard-form"

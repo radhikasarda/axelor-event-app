@@ -12,6 +12,7 @@ import javax.mail.MessagingException;
 import com.axelor.apps.message.db.EmailAddress;
 import com.axelor.apps.message.db.Message;
 import com.axelor.apps.message.db.repo.EmailAccountRepository;
+import com.axelor.apps.message.db.repo.TemplateRepository;
 import com.axelor.apps.message.service.MessageService;
 import com.axelor.event.db.Event;
 import com.axelor.event.db.EventRegistration;
@@ -61,36 +62,6 @@ public class EventController {
 		
 	}
 	
-
-	public void validateEventDate(ActionRequest request, ActionResponse response) {
-		
-		Event event = request.getContext().asType(Event.class);
-
-		if(event.getStartDate() != null && event.getEndDate() != null) {
-			
-			if(event.getStartDate().isAfter(event.getEndDate()) || event.getEndDate().isBefore(event.getStartDate())) {
-				
-				response.setError("Invalid Start Or End Dates");
-			}
-			
-		}
-		
-		if(event.getRegistrationOpen() !=null && event.getRegistrationClose() != null) {
-			if(event.getRegistrationOpen().isAfter(event.getRegistrationClose()) || event.getRegistrationClose().isBefore(event.getRegistrationOpen())) {
-				response.setError("Invalid Registration Open Or Close Dates");
-			}
-			
-		}
-		
-		if(event.getStartDate() !=null && event.getRegistrationClose() != null && event.getRegistrationOpen() != null) {
-			if(event.getRegistrationClose().isAfter(event.getStartDate().toLocalDate()) || event.getRegistrationOpen().isAfter(event.getStartDate().toLocalDate())) {
-				response.setError("Invalid Dates");
-				
-			}
-		}
-	
-	}
-	
 	public void sendEmail(ActionRequest request, ActionResponse response) {
 		
 		Event event = request.getContext().asType(Event.class);
@@ -129,6 +100,9 @@ public class EventController {
 				}
 		        
 		        response.setFlash("Email Sent successfully");
+			}
+			else {
+				response.setNotify("No recipents found!!");
 			}
 		}
 		

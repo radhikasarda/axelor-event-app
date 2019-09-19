@@ -11,6 +11,8 @@ import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 
+import antlr.debug.Event;
+
 
 public class ImportRegistrationController {
 	
@@ -27,10 +29,10 @@ public class ImportRegistrationController {
 			response.setError("Please upload a CSV file");
 		} else {
 			Integer id = (Integer) request.getContext().get("_id");
-			importEventRegistrationService.importCsv(dataFile, id);
-			response.setFlash("Registrations imported  successfully!!");
+			String message = importEventRegistrationService.importCsv(dataFile, id);
+			response.setFlash(message);
+		
 		}
-
 		
 	}
 
